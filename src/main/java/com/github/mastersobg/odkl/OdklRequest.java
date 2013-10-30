@@ -138,7 +138,25 @@ class OdklRequest {
             throw new OdklApiRuntimeException(e);
         }
         byte []data = md.digest(s.getBytes());
-        return new BigInteger(1, data).toString(16);
+        return byteArrayToHexString(data);
+    }
+
+    private String byteArrayToHexString(byte []data) {
+        StringBuilder sb = new StringBuilder();
+        for (int value : data) {
+            value &= 0xFF;
+            sb.append(digitToChar(value / 0x10));
+            sb.append(digitToChar(value % 0x10));
+        }
+        return sb.toString();
+    }
+
+    private char digitToChar(int digit) {
+        if (digit < 10) {
+            return (char) (digit + '0');
+        } else {
+            return (char) (digit - 10 + 'a');
+        }
     }
 
     private class Param implements Comparable<Param> {
