@@ -22,7 +22,7 @@ public class GroupsApi {
         this.api = api;
     }
 
-    public List<Group> getInfo(List<String> uids) {
+    public List<Group> getInfo(List<Long> uids) {
         if (uids == null) {
             throw new IllegalArgumentException("uids are null");
         }
@@ -39,18 +39,42 @@ public class GroupsApi {
         return groups;
     }
 
-    public List<Long> getMembers(Long uid) {
-        return null;
+    public List<Long> getMembers(Long uid, String anchor, String direction, int count) {
+        if (uid == null) {
+            throw new IllegalArgumentException("uid is null");
+        }
+
+        OdklRequest request = api
+                .createApiRequest("group", "getMembers")
+                .addParam("uid", uid.toString())
+                .addParam("count", Integer.toString(count));
+
+        if (anchor != null) {
+            request.addParam("anchor", anchor);
+            if (direction != null) {
+                request.addParam("direction", direction);
+            }
+        }
+
+        JSONObject json = JsonUtil.parseObject(api.sendRequest(request));
+        JSONArray array = JsonUtil.getArray(json, "members");
+
+        List<Long> list = new ArrayList<Long>(array.size());
+        for (Object o : array) {
+            JSONObject jsonObject = (JSONObject) o;
+            list.add(JsonUtil.getLong(jsonObject, "userId"));
+        }
+        return list;
     }
 
-    private static String join(List<String> uids) {
+    private static String join(List<Long> uids) {
         if (uids.isEmpty()) {
             return "";
         }
-        Iterator<String> it = uids.iterator();
-        StringBuilder result = new StringBuilder(it.next());
+        Iterator<Long> it = uids.iterator();
+        StringBuilder result = new StringBuilder(it.next().toString());
         while(it.hasNext()) {
-            result.append(",").append(it.next());
+            result.append(",").append(it.next().toString());
         }
         return result.toString();
     }

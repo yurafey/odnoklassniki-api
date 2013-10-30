@@ -1,16 +1,10 @@
 package com.github.mastersobg.odkl;
 
-import com.github.mastersobg.odkl.OdklApi;
-import com.github.mastersobg.odkl.OdklRequest;
 import com.github.mastersobg.odkl.util.JsonUtil;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * <pp>Friends</pp> API methods
@@ -138,7 +132,7 @@ public class FriendsApi {
         return ret;
     }
 
-    private static List<Long> parseLongs(JSONArray array) {
+    private List<Long> parseLongs(JSONArray array) {
         List<Long> result = new ArrayList<Long>(array.size());
         for (Object o : array) {
             result.add(Long.valueOf((String) o));
