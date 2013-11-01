@@ -8,6 +8,15 @@ import org.json.simple.JSONObject;
  */
 public class Group {
 
+    public enum UserStatus {
+        ACTIVE,
+        BLOCKED,
+        ADMIN,
+        MODERATOR,
+        PASSIVE,
+        UNKNOWN
+    }
+
     private final Long id;
     private final String name;
     private final String description;

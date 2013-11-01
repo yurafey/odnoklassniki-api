@@ -7,9 +7,7 @@ import com.github.mastersobg.odkl.util.JsonUtil;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.List;
+import java.util.*;
 
 /**
  * @author Ivan Gorbachev <gorbachev.ivan@gmail.com>
@@ -40,6 +38,9 @@ public class GroupsApi {
     }
 
     public List<Long> getMembers(Long uid, String anchor, String direction, int count) {
+        if (true) {
+            throw new UnsupportedOperationException();
+        }
         if (uid == null) {
             throw new IllegalArgumentException("uid is null");
         }
@@ -67,7 +68,31 @@ public class GroupsApi {
         return list;
     }
 
-    private static String join(List<Long> uids) {
+    public Map<Long, Group.UserStatus> getUserGroupsByIds(Long groupId, List<Long> uids) {
+        if (groupId == null) {
+            throw new IllegalArgumentException("groupId is null");
+        }
+        if (uids == null) {
+            throw new IllegalArgumentException("uids are null");
+        }
+
+        OdklRequest request = api
+                .createApiRequest("group", "getUserGroupsByIds")
+                .addParam("group_id", groupId.toString())
+                .addParam("uids", join(uids));
+
+        JSONArray array = JsonUtil.parseArray(api.sendRequest(request));
+        Map<Long, Group.UserStatus> result = new HashMap<Long, Group.UserStatus>();
+        for (Object o : array) {
+            JSONObject jsonObject = (JSONObject) o;
+            Long userId = JsonUtil.getLong(jsonObject, "userId");
+            Group.UserStatus status = Group.UserStatus.valueOf(JsonUtil.getString(jsonObject, "status"));
+            result.put(userId, status);
+        }
+        return result;
+    }
+
+    private static <Long> String join(List<Long> uids) {
         if (uids.isEmpty()) {
             return "";
         }
