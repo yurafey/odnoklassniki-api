@@ -1,6 +1,7 @@
 package com.github.mastersobg.odkl.util;
 
 import com.github.mastersobg.odkl.exception.OdklApiRuntimeException;
+import com.github.mastersobg.odkl.model.PageableResponse;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
@@ -91,6 +92,14 @@ public class JsonUtil {
             return null;
         }
         return (JSONArray) o;
+    }
+
+    public static <T> PageableResponse<T> getPageableResponse(JSONObject json, T data) {
+        String anchor = getString(json, "anchor");
+        if (anchor == null) {
+            throw new OdklApiRuntimeException("anchor not found");
+        }
+        return new PageableResponse<T>(data, anchor);
     }
 
     public static Date getDate(JSONObject json, String key) {

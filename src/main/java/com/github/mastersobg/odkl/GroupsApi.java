@@ -3,6 +3,8 @@ package com.github.mastersobg.odkl;
 import com.github.mastersobg.odkl.OdklApi;
 import com.github.mastersobg.odkl.OdklRequest;
 import com.github.mastersobg.odkl.model.Group;
+import com.github.mastersobg.odkl.model.PageableResponse;
+import com.github.mastersobg.odkl.model.Pagination;
 import com.github.mastersobg.odkl.util.JsonUtil;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
@@ -37,24 +39,19 @@ public class GroupsApi {
         return groups;
     }
 
-    public List<Long> getMembers(Long uid, String anchor, String direction, int count) {
-        if (true) {
-            throw new UnsupportedOperationException();
-        }
+    public PageableResponse<List<Long>> getMembers(Long uid, Pagination pagination) {
         if (uid == null) {
             throw new IllegalArgumentException("uid is null");
         }
 
         OdklRequest request = api
                 .createApiRequest("group", "getMembers")
-                .addParam("uid", uid.toString())
-                .addParam("count", Integer.toString(count));
+                .addParam("uid", uid.toString());
 
-        if (anchor != null) {
-            request.addParam("anchor", anchor);
-            if (direction != null) {
-                request.addParam("direction", direction);
-            }
+        if (pagination != null) {
+            request.addParam("anchor", pagination.getAnchor());
+            request.addParam("direction", pagination.getDirection().toString().toLowerCase());
+            request.addParam("count", Integer.toString(pagination.getCount()));
         }
 
         JSONObject json = JsonUtil.parseObject(api.sendRequest(request));
@@ -65,7 +62,7 @@ public class GroupsApi {
             JSONObject jsonObject = (JSONObject) o;
             list.add(JsonUtil.getLong(jsonObject, "userId"));
         }
-        return list;
+        return JsonUtil.getPageableResponse(json, list);
     }
 
     public Map<Long, Group.UserStatus> getUserGroupsByIds(Long groupId, List<Long> uids) {
