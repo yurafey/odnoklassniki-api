@@ -89,6 +89,28 @@ public class GroupsApi {
         return result;
     }
 
+    public PageableResponse<List<Long>> getUserGroupsV2(Pagination pagination) {
+        OdklRequest request = api
+                .createApiRequest("group", "getUserGroupsV2");
+
+        if (pagination != null) {
+            request.addParam("anchor", pagination.getAnchor());
+            request.addParam("direction", pagination.getDirection().toString().toLowerCase());
+            request.addParam("count", Integer.toString(pagination.getCount()));
+        }
+
+        JSONObject json = JsonUtil.parseObject(api.sendRequest(request));
+        JSONArray array = JsonUtil.getArray(json, "groups");
+
+        List<Long> list = new ArrayList<Long>();
+        for (Object o : array) {
+            JSONObject jsonObject = (JSONObject) o;
+            list.add(JsonUtil.getLong(jsonObject, "groupId"));
+        }
+
+        return JsonUtil.getPageableResponse(json, list);
+    }
+
     private static <Long> String join(List<Long> uids) {
         if (uids.isEmpty()) {
             return "";
