@@ -6,14 +6,12 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
-import java.math.BigInteger;
 import java.net.URL;
 import java.net.URLConnection;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
+import java.util.Map;
+import java.util.TreeMap;
 
 /**
  * @author Ivan Gorbachev <gorbachev.ivan@gmail.com>
@@ -24,7 +22,7 @@ class OdklRequest {
     public static final String OAUTH_URL = "http://api.odnoklassniki.ru/oauth/token.do";
     public static final String LOGIN_URL = "http://www.odnoklassniki.ru/oauth/authorize";
 
-    private final List<Param> params = new ArrayList<Param>();
+    private final Map<String, String> params = new TreeMap<String, String>();
     private boolean apiCall;
 
     private String accessToken;
@@ -35,13 +33,18 @@ class OdklRequest {
     private boolean sendPost;
 
     OdklRequest addParam(String key, String value) {
-        params.add(new Param(key, value));
+        params.put(key, value);
+        return this;
+    }
+
+    OdklRequest addParams(Map<String, String> params) {
+        this.params.putAll(params);
         return this;
     }
 
     OdklRequest setGroupAndMethod(String group, String method) {
         apiCall = true;
-        params.add(new Param("method", group + "." + method));
+        params.put("method", group + "." + method);
         return this;
     }
 
@@ -115,18 +118,24 @@ class OdklRequest {
     }
 
     private String calculateSig(String accessToken) {
-        Collections.sort(params);
         return md5(joinParams("") + md5(accessToken + clientSecretKey));
     }
 
     private String joinParams(String delimiter) {
         StringBuilder sb = new StringBuilder();
-        for (int i = 0; i < params.size(); ++i) {
-            if (i > 0) {
+
+        boolean appendDelimiter = false;
+        for (Map.Entry<String, String> entry : params.entrySet()) {
+            if (appendDelimiter) {
                 sb.append(delimiter);
             }
-            sb.append(params.get(i).asString());
+            sb.append(entry.getKey());
+            sb.append("=");
+            sb.append(entry.getValue());
+
+            appendDelimiter = true;
         }
+
         return sb.toString();
     }
 
@@ -137,11 +146,11 @@ class OdklRequest {
         } catch (NoSuchAlgorithmException e) {
             throw new OdklApiRuntimeException(e);
         }
-        byte []data = md.digest(s.getBytes());
+        byte[] data = md.digest(s.getBytes());
         return byteArrayToHexString(data);
     }
 
-    private String byteArrayToHexString(byte []data) {
+    private String byteArrayToHexString(byte[] data) {
         StringBuilder sb = new StringBuilder();
         for (int value : data) {
             value &= 0xFF;
@@ -156,26 +165,6 @@ class OdklRequest {
             return (char) (digit + '0');
         } else {
             return (char) (digit - 10 + 'a');
-        }
-    }
-
-    private class Param implements Comparable<Param> {
-
-        private final String key;
-        private final String value;
-
-        private Param(String key, String value) {
-            this.key = key;
-            this.value = value;
-        }
-
-        private String asString() {
-            return key + "=" + value;
-        }
-
-        @Override
-        public int compareTo(Param o) {
-            return key.compareTo(o.key);
         }
     }
 }

@@ -1,7 +1,5 @@
 package com.github.mastersobg.odkl;
 
-import com.github.mastersobg.odkl.OdklApi;
-import com.github.mastersobg.odkl.OdklRequest;
 import com.github.mastersobg.odkl.model.Group;
 import com.github.mastersobg.odkl.model.PageableResponse;
 import com.github.mastersobg.odkl.model.Pagination;
