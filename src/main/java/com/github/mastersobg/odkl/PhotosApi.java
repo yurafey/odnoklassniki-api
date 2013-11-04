@@ -13,7 +13,7 @@ public class PhotosApi {
 
     private final OdklApi api;
 
-    public PhotosApi(OdklApi api) {
+    PhotosApi(OdklApi api) {
         this.api = api;
     }
 

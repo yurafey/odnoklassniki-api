@@ -10,16 +10,30 @@ import org.json.simple.JSONObject;
 import java.util.*;
 
 /**
+ * <pp>Groups</pp> API methods
+ *
  * @author Ivan Gorbachev <gorbachev.ivan@gmail.com>
  */
 public class GroupsApi {
 
     private final OdklApi api;
 
-    public GroupsApi(OdklApi api) {
+    GroupsApi(OdklApi api) {
         this.api = api;
     }
 
+
+    /**
+     * Retrieves information about specified list of groups.
+     *
+     * @param uids ids of groups
+     * @return list of {@link Group} for every specified ID
+     * @throws com.github.mastersobg.odkl.exception.OdklApiException
+     *          if got API error
+     * @throws com.github.mastersobg.odkl.exception.OdklApiRuntimeException
+     *          if unexpected runtime error occurred
+     * @see <a href="http://apiok.ru/wiki/display/api/group.getInfo">http://apiok.ru/wiki/display/api/group.getInfo</a>
+     */
     public List<Group> getInfo(List<Long> uids) {
         if (uids == null) {
             throw new IllegalArgumentException("uids are null");
@@ -37,6 +51,18 @@ public class GroupsApi {
         return groups;
     }
 
+    /**
+     * Retrieves the list of the members of specified group
+     *
+     * @param uid        group id
+     * @param pagination pagination parameters
+     * @return {@code PageableResponse} with ids of members of specified group
+     * @throws com.github.mastersobg.odkl.exception.OdklApiException
+     *          if got API error
+     * @throws com.github.mastersobg.odkl.exception.OdklApiRuntimeException
+     *          if unexpected runtime error occurred
+     * @see <a href="http://apiok.ru/wiki/display/api/group.getMembers">http://apiok.ru/wiki/display/api/group.getMembers</a>
+     */
     public PageableResponse<Long> getMembers(Long uid, Pagination pagination) {
         if (uid == null) {
             throw new IllegalArgumentException("uid is null");
@@ -62,6 +88,18 @@ public class GroupsApi {
         return JsonUtil.getPageableResponse(json, list);
     }
 
+    /**
+     * Retrieves information about users' membership in the specified group.
+     *
+     * @param groupId group id
+     * @param uids    user IDs
+     * @return map where a key is a user id and a value is user membership status
+     * @throws com.github.mastersobg.odkl.exception.OdklApiException
+     *          if got API error
+     * @throws com.github.mastersobg.odkl.exception.OdklApiRuntimeException
+     *          if unexpected runtime error occurred
+     * @see <a href="http://apiok.ru/wiki/display/api/group.getUserGroupsByIds">http://apiok.ru/wiki/display/api/group.getUserGroupsByIds</a>
+     */
     public Map<Long, Group.UserStatus> getUserGroupsByIds(Long groupId, List<Long> uids) {
         if (groupId == null) {
             throw new IllegalArgumentException("groupId is null");
@@ -86,6 +124,18 @@ public class GroupsApi {
         return result;
     }
 
+    /**
+     * Retrieves list of the user's groups.
+     *
+     * @param pagination pagination parameters
+     * @return {@code PageableResponse} with ids of groups the current user is member of.
+     * @throws com.github.mastersobg.odkl.exception.OdklApiException
+     *          if got API error
+     * @throws com.github.mastersobg.odkl.exception.OdklApiRuntimeException
+     *          if unexpected runtime error occurred
+     * @see <a href="http://apiok.ru/wiki/display/api/group.getUserGroupsV2">http://apiok.ru/wiki/display/api/group.getUserGroupsV2</a>
+
+     */
     public PageableResponse<Long> getUserGroupsV2(Pagination pagination) {
         if (pagination == null) {
             throw new IllegalArgumentException("pagination is null");

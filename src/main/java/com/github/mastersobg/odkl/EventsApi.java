@@ -17,7 +17,7 @@ public class EventsApi {
 
     private final OdklApi api;
 
-    public EventsApi(OdklApi api) {
+    EventsApi(OdklApi api) {
         this.api = api;
     }
 

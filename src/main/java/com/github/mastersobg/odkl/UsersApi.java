@@ -12,7 +12,7 @@ public class UsersApi {
 
     private final OdklApi api;
 
-    public UsersApi(OdklApi api) {
+    UsersApi(OdklApi api) {
         this.api = api;
     }
 
