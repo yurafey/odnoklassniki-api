@@ -1,6 +1,11 @@
 package com.github.mastersobg.odkl.model;
 
+import java.util.HashMap;
+import java.util.Map;
+
 public class Pagination {
+
+    private static final int DEFAULT_COUNT = 10;
 
     public enum Direction {
         FORWARD,
@@ -11,14 +16,23 @@ public class Pagination {
     private final Direction direction;
     private final int count;
 
+    public Pagination() {
+        this(null, Direction.FORWARD, DEFAULT_COUNT);
+    }
+
+    public Pagination(String anchor, int count) {
+        this(anchor, Direction.FORWARD, count);
+    }
+
     public Pagination(String anchor) {
-        this(anchor, Direction.FORWARD, 10);
+        this(anchor, Direction.FORWARD, DEFAULT_COUNT);
+    }
+
+    public Pagination(int count) {
+        this(null, Direction.FORWARD, DEFAULT_COUNT);
     }
 
     public Pagination(String anchor, Direction direction, int count) {
-        if (anchor == null) {
-            throw new IllegalArgumentException("anchor is null");
-        }
         if (direction == null) {
             throw new IllegalArgumentException("direction is null");
         }
@@ -41,5 +55,17 @@ public class Pagination {
 
     public int getCount() {
         return count;
+    }
+
+    public Map<String, String> asParamsMap() {
+        Map<String, String> params = new HashMap<String, String>();
+
+        if (anchor != null) {
+            params.put("anchor", anchor);
+        }
+        params.put("direction", direction.toString().toLowerCase());
+        params.put("count", Integer.toString(count));
+
+        return params;
     }
 }

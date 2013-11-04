@@ -37,28 +37,29 @@ public class GroupsApi {
         return groups;
     }
 
-    public PageableResponse<List<Long>> getMembers(Long uid, Pagination pagination) {
+    public PageableResponse<Long> getMembers(Long uid, Pagination pagination) {
         if (uid == null) {
             throw new IllegalArgumentException("uid is null");
         }
 
+        if (pagination == null) {
+            throw new IllegalArgumentException("pagination is null");
+        }
+
         OdklRequest request = api
                 .createApiRequest("group", "getMembers")
-                .addParam("uid", uid.toString());
-
-        if (pagination != null) {
-            request.addParam("anchor", pagination.getAnchor());
-            request.addParam("direction", pagination.getDirection().toString().toLowerCase());
-            request.addParam("count", Integer.toString(pagination.getCount()));
-        }
+                .addParam("uid", uid.toString())
+                .addParams(pagination.asParamsMap());
 
         JSONObject json = JsonUtil.parseObject(api.sendRequest(request));
         JSONArray array = JsonUtil.getArray(json, "members");
 
-        List<Long> list = new ArrayList<Long>(array.size());
-        for (Object o : array) {
-            JSONObject jsonObject = (JSONObject) o;
-            list.add(JsonUtil.getLong(jsonObject, "userId"));
+        List<Long> list = new ArrayList<Long>();
+        if (array != null) {
+            for (Object o : array) {
+                JSONObject jsonObject = (JSONObject) o;
+                list.add(JsonUtil.getLong(jsonObject, "userId"));
+            }
         }
         return JsonUtil.getPageableResponse(json, list);
     }
@@ -78,32 +79,35 @@ public class GroupsApi {
 
         JSONArray array = JsonUtil.parseArray(api.sendRequest(request));
         Map<Long, Group.UserStatus> result = new HashMap<Long, Group.UserStatus>();
-        for (Object o : array) {
-            JSONObject jsonObject = (JSONObject) o;
-            Long userId = JsonUtil.getLong(jsonObject, "userId");
-            Group.UserStatus status = Group.UserStatus.valueOf(JsonUtil.getString(jsonObject, "status"));
-            result.put(userId, status);
+        if (array != null) {
+            for (Object o : array) {
+                JSONObject jsonObject = (JSONObject) o;
+                Long userId = JsonUtil.getLong(jsonObject, "userId");
+                Group.UserStatus status = Group.UserStatus.valueOf(JsonUtil.getString(jsonObject, "status"));
+                result.put(userId, status);
+            }
         }
         return result;
     }
 
-    public PageableResponse<List<Long>> getUserGroupsV2(Pagination pagination) {
-        OdklRequest request = api
-                .createApiRequest("group", "getUserGroupsV2");
-
-        if (pagination != null) {
-            request.addParam("anchor", pagination.getAnchor());
-            request.addParam("direction", pagination.getDirection().toString().toLowerCase());
-            request.addParam("count", Integer.toString(pagination.getCount()));
+    public PageableResponse<Long> getUserGroupsV2(Pagination pagination) {
+        if (pagination == null) {
+            throw new IllegalArgumentException("pagination is null");
         }
+
+        OdklRequest request = api
+                .createApiRequest("group", "getUserGroupsV2")
+                .addParams(pagination.asParamsMap());
 
         JSONObject json = JsonUtil.parseObject(api.sendRequest(request));
         JSONArray array = JsonUtil.getArray(json, "groups");
 
         List<Long> list = new ArrayList<Long>();
-        for (Object o : array) {
-            JSONObject jsonObject = (JSONObject) o;
-            list.add(JsonUtil.getLong(jsonObject, "groupId"));
+        if (array != null) {
+            for (Object o : array) {
+                JSONObject jsonObject = (JSONObject) o;
+                list.add(JsonUtil.getLong(jsonObject, "groupId"));
+            }
         }
 
         return JsonUtil.getPageableResponse(json, list);
@@ -115,7 +119,7 @@ public class GroupsApi {
         }
         Iterator<Long> it = uids.iterator();
         StringBuilder result = new StringBuilder(it.next().toString());
-        while(it.hasNext()) {
+        while (it.hasNext()) {
             result.append(",").append(it.next().toString());
         }
         return result.toString();
