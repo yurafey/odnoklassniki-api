@@ -55,11 +55,9 @@ public class GroupsApi {
         JSONArray array = JsonUtil.getArray(json, "members");
 
         List<Long> list = new ArrayList<Long>();
-        if (array != null) {
-            for (Object o : array) {
-                JSONObject jsonObject = (JSONObject) o;
-                list.add(JsonUtil.getLong(jsonObject, "userId"));
-            }
+        for (Object o : array) {
+            JSONObject jsonObject = (JSONObject) o;
+            list.add(JsonUtil.getLong(jsonObject, "userId"));
         }
         return JsonUtil.getPageableResponse(json, list);
     }
@@ -79,13 +77,11 @@ public class GroupsApi {
 
         JSONArray array = JsonUtil.parseArray(api.sendRequest(request));
         Map<Long, Group.UserStatus> result = new HashMap<Long, Group.UserStatus>();
-        if (array != null) {
-            for (Object o : array) {
-                JSONObject jsonObject = (JSONObject) o;
-                Long userId = JsonUtil.getLong(jsonObject, "userId");
-                Group.UserStatus status = Group.UserStatus.valueOf(JsonUtil.getString(jsonObject, "status"));
-                result.put(userId, status);
-            }
+        for (Object o : array) {
+            JSONObject jsonObject = (JSONObject) o;
+            Long userId = JsonUtil.getLong(jsonObject, "userId");
+            Group.UserStatus status = Group.UserStatus.valueOf(JsonUtil.getString(jsonObject, "status"));
+            result.put(userId, status);
         }
         return result;
     }
@@ -103,11 +99,9 @@ public class GroupsApi {
         JSONArray array = JsonUtil.getArray(json, "groups");
 
         List<Long> list = new ArrayList<Long>();
-        if (array != null) {
-            for (Object o : array) {
-                JSONObject jsonObject = (JSONObject) o;
-                list.add(JsonUtil.getLong(jsonObject, "groupId"));
-            }
+        for (Object o : array) {
+            JSONObject jsonObject = (JSONObject) o;
+            list.add(JsonUtil.getLong(jsonObject, "groupId"));
         }
 
         return JsonUtil.getPageableResponse(json, list);

@@ -9,10 +9,8 @@ import org.json.simple.parser.ParseException;
 
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Date;
-import java.util.List;
 
 /**
  * @author Ivan Gorbachev <gorbachev.ivan@gmail.com>
@@ -21,11 +19,9 @@ public class JsonUtil {
 
     public static final DateFormat DATE_FORMAT = new SimpleDateFormat("yyyy-MM-dd");
 
-    private static final JSONParser parser = new JSONParser();
-
     public static JSONObject parseObject(String json) {
         try {
-            return (JSONObject) parser.parse(json);
+            return (JSONObject) new JSONParser().parse(json);
         } catch (ParseException e) {
             throw new OdklApiRuntimeException(e);
         }
@@ -33,7 +29,12 @@ public class JsonUtil {
 
     public static JSONArray parseArray(String json) {
         try {
-            return (JSONArray) parser.parse(json);
+            Object object = new JSONParser().parse(json);
+            if (object == null) {
+                return new JSONArray();
+            } else {
+                return (JSONArray) object;
+            }
         } catch (ParseException e) {
             throw new OdklApiRuntimeException(e);
         }
@@ -63,14 +64,6 @@ public class JsonUtil {
         return Boolean.valueOf(o.toString());
     }
 
-    public static Double getDouble(JSONObject json, String key) {
-        Object o = json.get(key);
-        if (o == null) {
-            return null;
-        }
-        return Double.valueOf(o.toString());
-    }
-
     public static Long getLong(JSONObject json, String key) {
         Object o = json.get(key);
         if (o == null) {
@@ -90,7 +83,7 @@ public class JsonUtil {
     public static JSONArray getArray(JSONObject json, String key) {
         Object o = json.get(key);
         if (o == null) {
-            return null;
+            return new JSONArray();
         }
         return (JSONArray) o;
     }

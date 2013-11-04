@@ -8,6 +8,7 @@ import java.util.*;
 
 /**
  * <pp>Friends</pp> API methods
+ *
  * @author Ivan Gorbachev <gorbachev.ivan@gmail.com>
  */
 public class FriendsApi {
@@ -20,9 +21,12 @@ public class FriendsApi {
 
     /**
      * Returns friends' ids of the current user.
+     *
      * @return list of ids
-     * @throws com.github.mastersobg.odkl.exception.OdklApiException if got API error
-     * @throws com.github.mastersobg.odkl.exception.OdklApiRuntimeException if unexpected runtime error occurred
+     * @throws com.github.mastersobg.odkl.exception.OdklApiException
+     *          if got API error
+     * @throws com.github.mastersobg.odkl.exception.OdklApiRuntimeException
+     *          if unexpected runtime error occurred
      * @see <a href="http://apiok.ru/wiki/display/api/friends.get">http://apiok.ru/wiki/display/api/friends.get</a>
      */
     public List<Long> get() {
@@ -34,9 +38,12 @@ public class FriendsApi {
 
     /**
      * Returns IDs of the current user friends, who are authorized the calling application.
+     *
      * @return list of ids
-     * @throws com.github.mastersobg.odkl.exception.OdklApiException if got API error
-     * @throws com.github.mastersobg.odkl.exception.OdklApiRuntimeException if unexpected runtime error occurred
+     * @throws com.github.mastersobg.odkl.exception.OdklApiException
+     *          if got API error
+     * @throws com.github.mastersobg.odkl.exception.OdklApiRuntimeException
+     *          if unexpected runtime error occurred
      * @see <a href="http://apiok.ru/wiki/display/api/friends.getAppUsers">http://apiok.ru/wiki/display/api/friends.getAppUsers</a>
      */
     public List<Long> getAppUsers() {
@@ -49,11 +56,14 @@ public class FriendsApi {
 
     /**
      * Returns IDs of the current user friends, who have birthday today or in the nearest future .
+     *
      * @param future if false, returns only friends having birthday within nearest 3 days,
      *               otherwise returns users having birthday during next 30 days.
      * @return a map, where key is a user id and value is date of birthday
-     * @throws com.github.mastersobg.odkl.exception.OdklApiException if got API error
-     * @throws com.github.mastersobg.odkl.exception.OdklApiRuntimeException if unexpected runtime error occurred
+     * @throws com.github.mastersobg.odkl.exception.OdklApiException
+     *          if got API error
+     * @throws com.github.mastersobg.odkl.exception.OdklApiRuntimeException
+     *          if unexpected runtime error occurred
      * @see <a href="http://apiok.ru/wiki/display/api/friends.getBirthdays">http://apiok.ru/wiki/display/api/friends.getBirthdays</a>
      */
     public Map<Long, Date> getBirthdays(boolean future) {
@@ -76,10 +86,13 @@ public class FriendsApi {
 
     /**
      * Returns IDs of users who are friends of both current and target user
+     *
      * @param targetUserId target user id
      * @return list of common friends
-     * @throws com.github.mastersobg.odkl.exception.OdklApiException if got API error
-     * @throws com.github.mastersobg.odkl.exception.OdklApiRuntimeException if unexpected runtime error occurred
+     * @throws com.github.mastersobg.odkl.exception.OdklApiException
+     *          if got API error
+     * @throws com.github.mastersobg.odkl.exception.OdklApiRuntimeException
+     *          if unexpected runtime error occurred
      * @see <a href="http://apiok.ru/wiki/display/api/friends.getMutualFriends">http://apiok.ru/wiki/display/api/friends.getMutualFriends</a>
      */
     public List<Long> getMutualFriends(Long targetUserId) {
@@ -96,9 +109,12 @@ public class FriendsApi {
 
     /**
      * Returns IDs of online friends of the current user
+     *
      * @return list of ids
-     * @throws com.github.mastersobg.odkl.exception.OdklApiException if got API error
-     * @throws com.github.mastersobg.odkl.exception.OdklApiRuntimeException if unexpected runtime error occurred
+     * @throws com.github.mastersobg.odkl.exception.OdklApiException
+     *          if got API error
+     * @throws com.github.mastersobg.odkl.exception.OdklApiRuntimeException
+     *          if unexpected runtime error occurred
      * @see <a href="http://apiok.ru/wiki/display/api/friends.getOnline">http://apiok.ru/wiki/display/api/friends.getOnline</a>
      */
     public List<Long> getOnline() {
@@ -109,11 +125,14 @@ public class FriendsApi {
 
     /**
      * Checks friendship status between two specified users
+     *
      * @param userId1 id of the first user
      * @param userId2 id of the second user
      * @return <tt>true</tt> if users are friends
-     * @throws com.github.mastersobg.odkl.exception.OdklApiException if got API error
-     * @throws com.github.mastersobg.odkl.exception.OdklApiRuntimeException if unexpected runtime error occurred
+     * @throws com.github.mastersobg.odkl.exception.OdklApiException
+     *          if got API error
+     * @throws com.github.mastersobg.odkl.exception.OdklApiRuntimeException
+     *          if unexpected runtime error occurred
      * @see <a href="http://apiok.ru/wiki/display/api/friends.areFriends">http://apiok.ru/wiki/display/api/friends.areFriends</a>
      */
     public boolean areFriends(Long userId1, Long userId2) {
