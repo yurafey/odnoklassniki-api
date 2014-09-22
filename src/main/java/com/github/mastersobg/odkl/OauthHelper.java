@@ -1,6 +1,6 @@
 package com.github.mastersobg.odkl;
 
-import com.github.mastersobg.odkl.OdklApi;
+import com.github.mastersobg.odkl.auth.ApiConfig;
 
 import java.io.IOException;
 import java.util.Scanner;
@@ -10,19 +10,20 @@ import java.util.Scanner;
  */
 public class OauthHelper {
 
+    public static OdklApi api;
 
     private static void requestAccesToken() throws IOException {
         Scanner cin = new Scanner(System.in);
         System.out.print("Application ID: ");
-        String applicationId = cin.nextLine();
+        String applicationId = ApiConfig.APP_ID; //cin.nextLine();
         System.out.print("Application secret key: ");
-        String secretKey = cin.nextLine();
+        String secretKey = ApiConfig.APP_SECRET_KEY; //cin.nextLine();
         System.out.print("Redirect URI: ");
-        String redirectURI = cin.nextLine();
+        String redirectURI = "http://google.ru";//cin.nextLine();
         System.out.print("Scope (VALUABLE ACCESS;SET STATUS;PHOTO CONTENT): ");
-        String scope = cin.nextLine();
+        String scope = "VALUABLE_ACCESS";
 
-        OdklApi api = new OdklApi(applicationId, "", secretKey, "", "");
+        api = new OdklApi(applicationId, "", secretKey, "", "");
         System.out.println("Visit this page and authorize access:\n" + api.getLoginUrl(redirectURI, scope));
         System.out.print("Paste the code from the query string after redirect: ");
         String code = cin.nextLine();
@@ -33,20 +34,18 @@ public class OauthHelper {
     private static void requestRefreshAccesToken() throws IOException {
         Scanner cin = new Scanner(System.in);
         System.out.print("Application ID: ");
-        String applicationId = cin.nextLine();
+        String applicationId = ApiConfig.APP_ID;
         System.out.print("Application secret key: ");
-        String secretKey = cin.nextLine();
+        String secretKey = ApiConfig.APP_ID;
         System.out.print("Refresh token: ");
         String refreshToken = cin.nextLine();
-        OdklApi api = new OdklApi(applicationId, "", secretKey, "", "");
+        api = new OdklApi(applicationId, "", secretKey, "", "");
         System.out.println("Tokens:\n" + api.refreshToken(refreshToken));
     }
 
     public static void main(String []args) throws IOException {
-        if (args.length > 0) {
-            requestRefreshAccesToken();
-        } else {
-            requestAccesToken();
-        }
+        api = new OdklApi(ApiConfig.APP_ID, ApiConfig.APP_PUBLIC_KEY, ApiConfig.APP_SECRET_KEY,ApiConfig.ACCESS_TOKEN , ApiConfig.REFRESH_TOKEN);
+
+        System.out.print(api.friends().get());
     }
 }
