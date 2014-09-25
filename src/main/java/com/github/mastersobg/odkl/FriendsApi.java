@@ -36,6 +36,17 @@ public class FriendsApi {
         return parseLongs(json);
     }
 
+    public List<Long> getFriends (String targetUserId){
+        List<Long> resFriendList = new ArrayList<Long>();
+        OdklRequest request = api.createApiRequest("friends", "get")
+                .addParam("fid", targetUserId);
+        JSONArray json = JsonUtil.parseArray(api.sendRequest(request));
+        for (int i = 0; i < json.size(); i++ ){
+            resFriendList.add(Long.parseLong((String)json.get(i)));
+        }
+        return resFriendList;
+    }
+
     /**
      * Returns IDs of the current user friends, who are authorized the calling application.
      *
