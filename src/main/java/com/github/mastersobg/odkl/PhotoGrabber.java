@@ -40,6 +40,22 @@ public class PhotoGrabber {
 
     }
 
+    public JSONArray getTags(String photoid){
+        OdklRequest request = api
+                .createApiRequest("photos", "getTags")
+                .addParam("photo_id", photoid);
+        String response = api.sendRequest(request);
+        JSONObject responseJson = JsonUtil.parseObject(response);
+        JSONArray tagsArray = JsonUtil.getArray(responseJson,"photo_tags");
+//        for (int i = 0; i < getTags.size(); i++){
+//            JSONObject tag = (JSONObject)getTags.get(i);
+//            System.out.println(tag.get("id") + " "+ tag.get("x")+ " "+ tag.get("y"));
+//
+//        }
+        return tagsArray; 
+
+    }
+
     public boolean grabPhotos(String userId) {
         OdklRequest request = api
                 .createApiRequest("photos", "getPhotos")
