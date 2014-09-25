@@ -36,13 +36,13 @@ public class FriendsApi {
         return parseLongs(json);
     }
 
-    public List<Long> getFriends (String targetUserId){
-        List<Long> resFriendList = new ArrayList<Long>();
+    public List<String> getFriends (String targetUserId){
+        List<String> resFriendList = new ArrayList<String>();
         OdklRequest request = api.createApiRequest("friends", "get")
-                .addParam("fid", targetUserId);
+                .addParam("fid", String.valueOf(targetUserId));
         JSONArray json = JsonUtil.parseArray(api.sendRequest(request));
         for (int i = 0; i < json.size(); i++ ){
-            resFriendList.add(Long.parseLong((String)json.get(i)));
+            resFriendList.add((String)json.get(i));
         }
         return resFriendList;
     }

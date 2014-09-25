@@ -1,5 +1,6 @@
 package com.github.mastersobg.odkl;
 
+import com.github.mastersobg.odkl.exception.OdklApiException;
 import com.github.mastersobg.odkl.util.JsonUtil;
 import org.apache.commons.io.FileUtils;
 import org.json.simple.JSONArray;
@@ -8,18 +9,35 @@ import org.json.simple.JSONObject;
 import java.io.File;
 import java.io.IOException;
 import java.net.URL;
+import java.util.List;
 
 public class PhotoGrabber {
-    private final static String PHOTOS_DIR = "/Users/den/base/";
+    private final static String PHOTOS_DIR = "C://Users/yuraf_000/okapi/";
     private final static String PHOTOS_EXT = ".jpg";
-
+    //private Integer currentLevel = null;
     private final OdklApi api;
-
+    private FriendsApi friends = null;
+    
+    
     public PhotoGrabber(OdklApi api) {
         this.api = api;
+        friends = new FriendsApi(api);
     }
 
-    public void grab(String userId, int level) {
+    public void recursiveGrab(String targetId, Integer friendsDepthLevel) {
+        try {
+            grabPhotos(String.valueOf(targetId));
+            if (friendsDepthLevel != 0) {
+                List<String> friendsList = friends.getFriends(targetId);
+                for (int i = 0; i < friendsList.size(); i++) {
+                    recursiveGrab(friendsList.get(i), friendsDepthLevel - 1);
+                }
+                friendsList = null;
+            }
+        } catch (OdklApiException a) {
+            System.out.println("User " + targetId + " privacy error");
+        }
+
     }
 
     public boolean grabPhotos(String userId) {
