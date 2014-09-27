@@ -12,8 +12,12 @@ public class Main {
         PhotoGrabber gr = new PhotoGrabber(api);
         //574881296141 - Martin (2 friends)
         //559653274945 - Rudolf (4 friends)
-        //gr.recursiveGrab("559653274945", 3);
-        gr.grabUserMarkedPhotos("561861978257");
+        //gr.recursivePhotoGrab("559653274945", 3);
+
+        gr.recursivePhotoGrabWithMetadata("561861978257",2);
+
+        //gr.getUserMarkFromPhoto("561861978257","563026980282");
+
 
     }
 }
