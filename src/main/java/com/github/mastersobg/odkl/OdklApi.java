@@ -57,7 +57,7 @@ public class OdklApi {
         return new GroupsApi(this);
     }
 
-    OdklRequest createApiRequest(String group, String method) {
+    public OdklRequest createApiRequest(String group, String method) {
         return createRequest()
                 .setAccessToken(accessToken)
                 .setClientSecretKey(clientSecretKey)
@@ -69,7 +69,7 @@ public class OdklApi {
         return new OdklRequest();
     }
 
-    String sendRequest(OdklRequest request) {
+    public String sendRequest(OdklRequest request) {
         String response = request.sendRequest();
         for (int it = 0; it < MAX_REFRESH_COUNT && response.contains(TOKEN_EXPIRED_ERROR); ++it) {
             refreshToken();

@@ -1,5 +1,8 @@
-package com.github.mastersobg.odkl;
+package com.github.mastersobg.odkl.photoGrabber;
 
+import com.github.mastersobg.odkl.FriendsApi;
+import com.github.mastersobg.odkl.OdklApi;
+import com.github.mastersobg.odkl.OdklRequest;
 import com.github.mastersobg.odkl.exception.OdklApiException;
 import com.github.mastersobg.odkl.util.JsonUtil;
 import org.apache.commons.io.FileUtils;
@@ -70,7 +73,7 @@ public class PhotoGrabber {
             JSONObject userMarkFromPhoto = getUserMarkFromPhoto(targetId, photoId);
             if (userMarkFromPhoto == null ) System.out.println("NULL POINTER EXCEPTION");
             else {
-                System.out.println(userMarkFromPhoto.toString());
+                //System.out.println(userMarkFromPhoto.toString());
                 userJson.addMarkedPhoto(photoId, photoIdOwnerIdMap.get(photoId), (Long) userMarkFromPhoto.get("x"), (Long) userMarkFromPhoto.get("y"));
             }
         }

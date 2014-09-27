@@ -1,4 +1,4 @@
-package com.github.mastersobg.odkl;
+package com.github.mastersobg.odkl.photoGrabber;
 
 import org.apache.commons.io.FileUtils;
 import org.json.simple.JSONArray;

@@ -1,6 +1,7 @@
 package com.github.mastersobg.odkl;
 
 import com.github.mastersobg.odkl.auth.ApiConfig;
+import com.github.mastersobg.odkl.photoGrabber.PhotoGrabber;
 
 import java.io.IOException;
 import java.util.Scanner;
