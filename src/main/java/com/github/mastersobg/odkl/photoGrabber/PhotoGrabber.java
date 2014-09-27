@@ -112,7 +112,8 @@ public class PhotoGrabber {
     public HashMap<String,String> grabUserPhotos(String userId) {
         OdklRequest request = api
                 .createApiRequest("photos", "getPhotos")
-                .addParam("fid", userId);
+                .addParam("fid", userId)
+                .addParam("count","100");
 
         return grabber(userId, api.sendRequest(request));
     }
@@ -121,7 +122,8 @@ public class PhotoGrabber {
         OdklRequest request = api
                 .createApiRequest("photos", "getPhotos")
                 .addParam("fid", userId)
-                .addParam("aid","tags");
+                .addParam("aid","tags")
+                .addParam("count","100");
         return grabber(userId, api.sendRequest(request));
     }
 
