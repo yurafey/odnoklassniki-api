@@ -33,6 +33,9 @@ public class OdklRequest {
     private boolean sendPost;
 
     public OdklRequest addParam(String key, String value) {
+        if (params.containsKey(key)){
+            params.remove(key);
+        }
         params.put(key, value);
         return this;
     }

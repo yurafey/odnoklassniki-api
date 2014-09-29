@@ -1,6 +1,5 @@
 package com.github.mastersobg.odkl.photoGrabber;
 
-import com.github.mastersobg.odkl.FriendsApi;
 import com.github.mastersobg.odkl.OdklApi;
 import com.github.mastersobg.odkl.OdklRequest;
 import com.github.mastersobg.odkl.exception.OdklApiException;
@@ -12,36 +11,15 @@ import org.json.simple.JSONObject;
 import java.io.File;
 import java.io.IOException;
 import java.net.URL;
-import java.util.HashMap;
-import java.util.List;
+import java.util.*;
 
 public class PhotoGrabber {
-    private final static String PHOTOS_DIR = "C://Users/yuraf_000/okapi/";
-    private final static String PHOTOS_EXT = ".jpg";
-    //private Integer currentLevel = null;
+    private final static String PHOTOS_DIR = PhotoGrabberConfig.PHOTOS_DIR;
+    private final static String PHOTOS_EXT = PhotoGrabberConfig.PHOTOS_EXT;
     private final OdklApi api;
-    private FriendsApi friends = null;
-    
-    
+
     public PhotoGrabber(OdklApi api) {
         this.api = api;
-        friends = new FriendsApi(api);
-    }
-
-    public void recursivePhotoGrab(String targetId, Integer friendsDepthLevel) {
-        try {
-            grabUserPhotos(targetId);
-            if (friendsDepthLevel != 0) {
-                List<String> friendsList = friends.getFriends(targetId);
-                for (int i = 0; i < friendsList.size(); i++) {
-                    recursivePhotoGrab(friendsList.get(i), friendsDepthLevel - 1);
-                }
-                friendsList = null;
-            }
-        } catch (OdklApiException a) {
-            System.out.println("User " + targetId + " privacy error");
-        }
-
     }
 
     public void recursivePhotoGrabWithMetadata(String targetId, Integer friendsDepthLevel) {
@@ -49,102 +27,195 @@ public class PhotoGrabber {
             grabUserPhotosWithMetadata(targetId);
             //recursive part
             if (friendsDepthLevel != 0) {
-                List<String> friendsList = friends.getFriends(targetId);
+                List<String> friendsList = api.friends().getFriends(targetId);
                 for (int i = 0; i < friendsList.size(); i++) {
                     recursivePhotoGrabWithMetadata(friendsList.get(i), friendsDepthLevel - 1);
                 }
-                friendsList = null;
             }
         } catch (OdklApiException a) {
             System.out.println("User " + targetId + " privacy error");
         }
-
     }
 
-    public void grabUserPhotosWithMetadata (String targetId){
+    public void grabUserPhotosWithMetadata(String targetId) {
         JsonUser userJson = new JsonUser(targetId);
-
-        JSONArray friendsArray = new JSONArray();           //friends retrieving
-        friendsArray.addAll(friends.getFriends(targetId));  //
-        userJson.setFriends(friendsArray);                  //
-
-        HashMap<String,String> photoIdOwnerIdMap = grabUserMarkedPhotos(targetId);
-        for (String photoId: photoIdOwnerIdMap.keySet()){
-            JSONObject userMarkFromPhoto = getUserMarkFromPhoto(targetId, photoId);
-            if (userMarkFromPhoto == null ) System.out.println("NULL POINTER EXCEPTION");
-            else {
-                //System.out.println(userMarkFromPhoto.toString());
-                userJson.addMarkedPhoto(photoId, photoIdOwnerIdMap.get(photoId), (Long) userMarkFromPhoto.get("x"), (Long) userMarkFromPhoto.get("y"));
-            }
-        }
-        grabUserPhotos(targetId);
+        JSONArray friendsArray = new JSONArray();
+        friendsArray.addAll(api.friends().getFriends(targetId));
+        userJson.setFriends(friendsArray);
+        userJson.addMarkedPhoto(getMetainfoJsonArray(grabUserMarkedPhotos(targetId))); //grab marked photos from friends albums
+        userJson.addMarkedPhoto(getMetainfoJsonArray(grabUserPhotos(targetId))); //grab user photos from personal album
+        userJson.addMarkedPhoto(getMetainfoJsonArray(grabUserMarkedPhotosFromPersonalAlbums(targetId))); // grab user marked photos from all his albums (except his personal album)
         userJson.writeJson();
     }
 
+    private JSONArray getMetainfoJsonArray(Map<String, Map<String, Object>> metainfoMap) {
+        JSONArray resultArray = new JSONArray();
+        if (metainfoMap!=null) {
+            for (String photoId : metainfoMap.keySet()) {
+                Map<String, Object> currentOwnerIdAndTagsMap = metainfoMap.get(photoId);
+                JSONObject currentTag = new JSONObject();
+                currentTag.put("photoId", photoId);
+                currentTag.put("photoOwner", currentOwnerIdAndTagsMap.get("ownerId"));
+                currentTag.put("x", ((JSONObject) (currentOwnerIdAndTagsMap.get("tag"))).get("x"));
+                currentTag.put("y", ((JSONObject) (currentOwnerIdAndTagsMap.get("tag"))).get("y"));
+                resultArray.add(currentTag);
+            }
+        }
+        return resultArray;
+    }
 
-    public JSONObject getUserMarkFromPhoto(String userId, String photoId) {
+    private Map<String,Map<String,Object>> grabUserPhotos(String userId) {
+        OdklRequest request = api
+                .createApiRequest("photos", "getPhotos")
+                .addParam("fid", userId)
+                .addParam("count","100");
+        return recursiveGrabber(request,userId,null);
+    }
+
+    private Map<String,Map<String,Object>> grabUserMarkedPhotos(String userId) {
+        OdklRequest request = api
+                .createApiRequest("photos", "getPhotos")
+                .addParam("fid", userId)
+                .addParam("aid","tags")
+                .addParam("count","100");
+        return recursiveGrabber(request,userId,null);
+    }
+
+    private Map<String,Map<String,Object>> recursiveGrabber(OdklRequest request,String userId, Map<String,Map<String,Object>> fullMap) {
+        String response = api.sendRequest(request);
+        JSONObject responseJson = JsonUtil.parseObject(response);
+        Map<String,Map<String,Object>> grabberTemp = grabber(userId,responseJson);
+        if (grabberTemp!=null){
+            if (fullMap==null) fullMap = grabberTemp;
+            else {
+                fullMap.putAll(grabberTemp);
+            }
+        }
+        if ((Boolean)responseJson.get("hasMore")) {
+            String anchor = (String) responseJson.get("anchor");
+            return recursiveGrabber(request.addParam("anchor", anchor), userId, fullMap);
+        }
+        return fullMap;
+    }
+
+    private Map<String,Map<String,Object>> grabber(String userId, JSONObject responseJson) {
+        JSONArray photos = JsonUtil.getArray(responseJson, "photos");
+        Map<String,Map<String,Object>> photoIdOwnerIdTagsMap = new HashMap<String, Map<String, Object>>();
+        for (int i = 0; i < photos.size(); i++) {
+            JSONObject photo = (JSONObject) photos.get(i);
+            String photoOwnerId = JsonUtil.getString(photo,"user_id");
+            String imgUrl = JsonUtil.getString(photo, "pic640x480");
+            String photoId = (String) photo.get("id");
+            JSONObject currentTag = getUserMarkFromPhoto(userId, photoId);
+            if (currentTag!=null) {
+                Map<String,Object> additionMap = new HashMap<String, Object>();
+                additionMap.put("ownerId",photoOwnerId);
+                additionMap.put("tag",currentTag);
+                photoIdOwnerIdTagsMap.put(photoId, additionMap);
+            }
+            loadImage(imgUrl, userId, photoId);
+        }
+        return photoIdOwnerIdTagsMap.isEmpty()?null:photoIdOwnerIdTagsMap;
+    }
+
+    private JSONObject getUserMarkFromPhoto(String userId, String photoId) {
         JSONArray marksArray = getAllMarksFromPhoto(photoId);
         for (int i = 0; i < marksArray.size(); i++) {
             JSONObject tag = (JSONObject) marksArray.get(i);
-            if (((String) tag.get("id")).equals(userId)) {
+            if (tag.get("id").equals(userId)) {
+                tag.put("photo_id",photoId);
                 return tag;
             }
         }
         return null;
     }
 
-    public JSONArray getAllMarksFromPhoto(String photoId){
+    private JSONArray getAllMarksFromPhoto(String photoId) {
         OdklRequest request = api
                 .createApiRequest("photos", "getTags")
                 .addParam("photo_id", photoId);
         String response = api.sendRequest(request);
         JSONObject responseJson = JsonUtil.parseObject(response);
         JSONArray marksArray = JsonUtil.getArray(responseJson,"photo_tags");
-//        for (int i = 0; i < marksArray.size(); i++){
-//            JSONObject tag = (JSONObject)marksArray.get(i);
-//            System.out.println(tag.get("id") + " "+ tag.get("x")+ " "+ tag.get("y"));
-//
-//        }
         return marksArray;
-
     }
 
-    public HashMap<String,String> grabUserPhotos(String userId) {
+    private List<String> getUserAlbumIds(String userId) {
+        OdklRequest request = api
+                .createApiRequest("photos", "getAlbums")
+                .addParam("fid", userId)
+                .addParam("count","100");
+        JSONObject responseJson = JsonUtil.parseObject(api.sendRequest(request));
+        JSONArray albumArray = JsonUtil.getArray(responseJson, "albums");
+        List<String> albumIds = new ArrayList<String>();
+        for (int i = 0; i < albumArray.size(); i++) {
+            JSONObject album = (JSONObject) albumArray.get(i);
+            albumIds.add(JsonUtil.getString(album,"aid"));
+        }
+        return albumIds;
+    }
+
+    private Map<String,Map<String,Object>> grabUserMarkedPhotosFromPersonalAlbums(String userId) {
+        Map<String,Map<String,Object>> photoIdOwnerIdTagsMap = new HashMap<String, Map<String, Object>>();
+        List<String> albumList = getUserAlbumIds(userId);
+        for (int albumIterator=0; albumIterator < albumList.size(); albumIterator++){
+            List<String> photoIdList = getAlbumPhotoIdList(userId, albumList.get(albumIterator));
+            for (int i = 0; i < photoIdList.size(); i++){
+                String photoId = photoIdList.get(i);
+                JSONObject tag = getUserMarkFromPhoto(userId,photoId);
+                if (tag!=null) {
+                    Map<String,Object> additionMap = new HashMap<String, Object>();
+                    additionMap.put("ownerId",userId);
+                    additionMap.put("tag",tag);
+                    photoIdOwnerIdTagsMap.put(photoId, additionMap);
+                    loadImage(getPhotoUrl(photoId),userId,photoId);
+                }
+            }
+        }
+        return photoIdOwnerIdTagsMap.isEmpty()?null:photoIdOwnerIdTagsMap;
+    }
+
+    private String getPhotoUrl(String photoId) {
+        OdklRequest request = api
+                .createApiRequest("photos", "getPhotoInfo")
+                .addParam("photo_id", photoId);
+        JSONObject responseJson = JsonUtil.parseObject(api.sendRequest(request));
+        return JsonUtil.getString(((JSONObject)responseJson.get("photo")), "pic640x480");
+    }
+
+    private List<String> getAlbumPhotoIdList(String userId, String albumId) {
         OdklRequest request = api
                 .createApiRequest("photos", "getPhotos")
                 .addParam("fid", userId)
+                .addParam("aid",albumId)
                 .addParam("count","100");
-
-        return grabber(userId, api.sendRequest(request));
+        return recursiveGetPhotoList(request,userId,null);
     }
 
-    public HashMap<String,String> grabUserMarkedPhotos(String userId){
-        OdklRequest request = api
-                .createApiRequest("photos", "getPhotos")
-                .addParam("fid", userId)
-                .addParam("aid","tags")
-                .addParam("count","100");
-        return grabber(userId, api.sendRequest(request));
+    private List<String> recursiveGetPhotoList(OdklRequest request, String userId, List<String> fullList) {
+        JSONObject responseJson = JsonUtil.parseObject(api.sendRequest(request));
+        if (fullList==null) fullList = grabList(responseJson);
+        else {
+            fullList.addAll(grabList(responseJson));
+        }
+        if ((Boolean)responseJson.get("hasMore")) {
+            String anchor = (String) responseJson.get("anchor");
+            return recursiveGetPhotoList(request.addParam("anchor", anchor), userId, fullList);
+        }
+        return fullList;
     }
 
-
-
-    private HashMap<String,String> grabber (String userId, String response){
-        JSONObject responseJson = JsonUtil.parseObject(response);
+    private List<String> grabList(JSONObject responseJson){
+        List<String> fullList = new ArrayList<String>();
         JSONArray photos = JsonUtil.getArray(responseJson, "photos");
-        HashMap <String,String> PhotoIdOwnerMap = new HashMap();
         for (int i = 0; i < photos.size(); i++) {
             JSONObject photo = (JSONObject) photos.get(i);
-            String photoOwnerId = JsonUtil.getString(photo,"user_id");
-            String imgUrl = JsonUtil.getString(photo, "pic640x480");
-            String photoId = (String) photo.get("id");
-            PhotoIdOwnerMap.put(photoId, photoOwnerId);
-            boolean fileExists = imgLoader(imgUrl,userId,photoId);
+            fullList.add((String) photo.get("id"));
         }
-        return PhotoIdOwnerMap;
+        return fullList;
     }
 
-    private boolean imgLoader(String imgUrl, String userId, String photoId) {
+    private boolean loadImage(String imgUrl, String userId, String photoId) {
         File imageFile = new File(PHOTOS_DIR + userId + "/" + photoId + PHOTOS_EXT);
         if (!imageFile.exists()) {
             try {
@@ -152,8 +223,9 @@ public class PhotoGrabber {
             } catch (IOException e) {
                 e.printStackTrace();
             }
-        } else return false;
-
+        } else {
+            return false;
+        }
         return true;
     }
 }

@@ -13,12 +13,8 @@ public class TestMain {
         PhotoGrabber gr = new PhotoGrabber(api);
         //574881296141 - Martin (2 friends)
         //559653274945 - Rudolf (4 friends)
-        //gr.recursivePhotoGrab("559653274945", 3);
 
-        gr.recursivePhotoGrabWithMetadata("530326793021",2);
-
-        //gr.getUserMarkFromPhoto("561861978257","563026980282");
-
-
-    }
+        gr.grabUserPhotosWithMetadata("530326793021"); //grub one user with metadata
+//        gr.recursivePhotoGrabWithMetadata("530326793021",1); // grub user and his friends with metadata
+     }
 }

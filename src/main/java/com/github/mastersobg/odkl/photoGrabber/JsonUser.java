@@ -14,17 +14,16 @@ public class JsonUser {
     private String uid = new String();
     private JSONArray friends = new JSONArray();
     private JSONArray markedPhotos = new JSONArray();
-    private final static String PHOTOS_DIR = "C://Users/yuraf_000/okapi/";
-    private final static String JSON_EXT = ".json";
-
+    private final static String PHOTOS_DIR = PhotoGrabberConfig.PHOTOS_DIR;
+    private final static String JSON_EXT = PhotoGrabberConfig.JSON_EXT;
 
     public JsonUser(String userId){
         uid = userId;
     }
-    public void setFriends (JSONArray friends) {
+    public void setFriends(JSONArray friends) {
         this.friends = friends;
     }
-    public void addMarkedPhoto (String photoId, String photoOwner, Long x, Long y){
+    public void addMarkedPhoto(String photoId, String photoOwner, Long x, Long y){
         JSONObject addition = new JSONObject();
         addition.put("photoId",photoId);
         addition.put("photoOwner",photoOwner);
@@ -32,23 +31,20 @@ public class JsonUser {
         addition.put("y",y);
         markedPhotos.add(addition);
     }
+    public void addMarkedPhoto(JSONArray additions){
+        markedPhotos.addAll(additions);
+    }
 
-    public boolean writeJson() {
+    public void writeJson() {
         JSONObject writeResult = new JSONObject();
-        writeResult.put("uid",uid);
-        writeResult.put("friends",friends);
-        writeResult.put("markedPhotos",markedPhotos);
-
-
+        writeResult.put("uid", uid);
+        writeResult.put("friends", friends);
+        writeResult.put("markedPhotos", markedPhotos);
         File jsonFile = new File(PHOTOS_DIR + uid + "/" + uid + JSON_EXT);
-        if (!jsonFile.exists()) {
-            try {
-                FileUtils.writeStringToFile(jsonFile,writeResult.toJSONString());
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-        } else return false;
-
-        return true;
+        try {
+            FileUtils.writeStringToFile(jsonFile, writeResult.toJSONString());
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 }
