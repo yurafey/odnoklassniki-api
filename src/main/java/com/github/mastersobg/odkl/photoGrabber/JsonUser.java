@@ -21,7 +21,7 @@ public class JsonUser {
         uid = userId;
     }
     public void setFriends(JSONArray friends) {
-        this.friends = friends;
+        if (friends!=null) this.friends = friends;
     }
     public void addMarkedPhoto(String photoId, String photoOwner, Long x, Long y){
         JSONObject addition = new JSONObject();
@@ -32,7 +32,7 @@ public class JsonUser {
         markedPhotos.add(addition);
     }
     public void addMarkedPhoto(JSONArray additions){
-        markedPhotos.addAll(additions);
+        if(additions!=null) markedPhotos.addAll(additions);
     }
 
     public void writeJson() {
@@ -46,5 +46,9 @@ public class JsonUser {
         } catch (IOException e) {
             e.printStackTrace();
         }
+    }
+    public boolean isEmpty() {
+        if (friends.isEmpty() && markedPhotos.isEmpty()) return true;
+        return false;
     }
 }
