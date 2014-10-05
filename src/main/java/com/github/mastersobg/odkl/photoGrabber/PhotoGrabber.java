@@ -50,9 +50,9 @@ public class PhotoGrabber {
                     friendsArray.addAll(friendsList);
                     userJson.setFriends(friendsArray);
                 }
-                if (LOGS) System.out.println(String.format("[MSG][uid%s] Grabbing photos from person album.",targetId));
-                userJson.addMetainfo(grabUserMarkedPhotos(targetId)); //grab marked photos from friends albums
                 if (LOGS) System.out.println(String.format("[MSG][uid%s] Grabbing marked photos from user friends.",targetId));
+                userJson.addMetainfo(grabUserMarkedPhotos(targetId)); //grab marked photos from friends albums
+                if (LOGS) System.out.println(String.format("[MSG][uid%s] Grabbing photos from personal album.",targetId));
                 userJson.addMetainfo(grabUserPhotos(targetId)); //grab user photos from personal album
                 if (LOGS) System.out.println(String.format("[MSG][uid%s] Grabbing marked photos from all user albums.",targetId));
                 userJson.addMetainfo(grabUserMarkedPhotosFromPersonalAlbums(targetId)); // grab user marked photos from all his albums (except his personal album)

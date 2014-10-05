@@ -14,6 +14,6 @@ public class TestMain {
         //574881296141 - Martin (2 friends)
         //559653274945 - Rudolf (4 friends)
         //gr.grabUserPhotosWithMetadata("563733877946"); //grub one user with metadata
-        gr.recursivePhotoGrabWithMetadata("563733877946",2); // grub user and his friends with metadata
+        gr.recursivePhotoGrabWithMetadata("211410835183",4); // grub user and his friends with metadata
      }
 }
