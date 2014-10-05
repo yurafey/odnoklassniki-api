@@ -42,10 +42,4 @@ public class OauthHelper {
         api = new OdklApi(applicationId, "", secretKey, "", "");
         System.out.println("Tokens:\n" + api.refreshToken(refreshToken));
     }
-
-    public static void main(String []args) throws IOException {
-        api = new OdklApi(ApiConfig.APP_ID, ApiConfig.APP_PUBLIC_KEY, ApiConfig.APP_SECRET_KEY,ApiConfig.ACCESS_TOKEN , ApiConfig.REFRESH_TOKEN);
-
-        new PhotoGrabber(api).grabPhotos("563733877946");
-    }
 }

@@ -15,7 +15,7 @@ public class FriendsApi {
 
     private final OdklApi api;
 
-    FriendsApi(OdklApi api) {
+    public FriendsApi(OdklApi api) {
         this.api = api;
     }
 

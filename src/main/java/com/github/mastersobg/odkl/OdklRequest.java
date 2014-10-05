@@ -16,7 +16,7 @@ import java.util.TreeMap;
 /**
  * @author Ivan Gorbachev <gorbachev.ivan@gmail.com>
  */
-class OdklRequest {
+public class OdklRequest {
 
     public static final String API_URL = "http://api.odnoklassniki.ru/fb.do";
     public static final String OAUTH_URL = "http://api.odnoklassniki.ru/oauth/token.do";
@@ -32,7 +32,10 @@ class OdklRequest {
 
     private boolean sendPost;
 
-    OdklRequest addParam(String key, String value) {
+    public OdklRequest addParam(String key, String value) {
+        if (params.containsKey(key)){
+            params.remove(key);
+        }
         params.put(key, value);
         return this;
     }
