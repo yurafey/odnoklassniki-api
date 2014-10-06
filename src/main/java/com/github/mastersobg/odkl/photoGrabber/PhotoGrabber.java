@@ -89,8 +89,9 @@ public class PhotoGrabber {
         Map<String,Object> result = recursiveGrabber(request,userId,null);
         if ((int)result.get("photosNum")!=0) {
             result.put("albumsNum",1);
+            return result;
         }
-        return result;
+        return null;
     }
 
     private Map<String,Object> grabUserMarkedPhotos(String userId) {
