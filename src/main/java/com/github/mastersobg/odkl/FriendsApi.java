@@ -49,7 +49,8 @@ public class FriendsApi {
             }
             return resFriendList;
         } catch (OdklApiRuntimeException e) {
-            if (PhotoGrabberConfig.LOGS) System.out.println("[ERR] Runtime error. Can't get friends. Connection failed");
+            if (PhotoGrabberConfig.LOGS)
+                System.out.println("[ERR] Runtime error. Can't get friends. Connection failed");
         }
         return null;
     }

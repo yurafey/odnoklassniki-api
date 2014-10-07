@@ -65,9 +65,14 @@ public class PhotoGrabber {
                 if (LOGS)  System.out.println(String.format("[ERR][uid%s] Privacy error.",targetId));
             }
         } else {
-            List<String> friendsList = api.friends().getFriends(targetId);
-            if (friendsList != null) {
-                return friendsList;
+            try {
+                //if (LOGS) System.out.println(String.format("[MSG][uid%s] Found user copy.",targetId));
+                List<String> friendsList = api.friends().getFriends(targetId);
+                if (friendsList != null) {
+                    return friendsList;
+                }
+            } catch (OdklApiException a){
+                if (LOGS)  System.out.println(String.format("[ERR][uid%s] Privacy error.",targetId));
             }
         }
         return null;
