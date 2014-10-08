@@ -16,16 +16,23 @@ public class PhotoGrabber {
 
     public List<String> getFriendsList(String targetId, Integer friendsDepthLevel) {
         System.out.println("target:" + targetId + " friendsDepth:" + friendsDepthLevel);
-        List<String> friendsList = api.friends().getFriends(targetId);
-        if ((friendsDepthLevel > 0) && (friendsList != null)) {
-            for (int i = 0; i < friendsList.size(); i++) {
-                List<String> tmp = getFriendsList(friendsList.get(i), friendsDepthLevel - 1);
-                if (tmp != null) {
-                    friendsList.addAll(tmp);
+        if (friendsDepthLevel < 0) {
+            return null;
+        } else if (friendsDepthLevel == 0) {
+            return api.friends().getFriends(targetId);
+        } else {
+            List<String> friendsList = api.friends().getFriends(targetId);
+            if ((friendsDepthLevel > 0) && (friendsList != null)) {
+                int size = friendsList.size();
+                for (int i = 0; i < size; i++) {
+                    List<String> tmp = getFriendsList(friendsList.get(i), friendsDepthLevel - 1);
+                    if (tmp != null) {
+                        friendsList.addAll(tmp);
+                    }
                 }
             }
+            return friendsList;
         }
-        return friendsList;
     }
 
 }
