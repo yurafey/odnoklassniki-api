@@ -1,5 +1,6 @@
 package com.github.mastersobg.odkl;
 
+import com.github.mastersobg.odkl.exception.OdklApiException;
 import com.github.mastersobg.odkl.exception.OdklApiRuntimeException;
 import com.github.mastersobg.odkl.photoGrabber.PhotoGrabberConfig;
 import com.github.mastersobg.odkl.util.JsonUtil;
@@ -51,6 +52,9 @@ public class FriendsApi {
         } catch (OdklApiRuntimeException e) {
             if (PhotoGrabberConfig.LOGS)
                 System.out.println("[ERR] Runtime error. Can't get friends. Connection failed");
+        } catch (OdklApiException a){
+            if (PhotoGrabberConfig.LOGS)
+                System.out.println("[ERR] Privacy error.");
         }
         return null;
     }
