@@ -30,18 +30,25 @@ public class PhotoGrabberUtils {
                 case "m":
                     System.out.println(String.format("[MSG][%s][uid%s] %s",thread,targetId,message));
                     break;
+                case "bt":
+                    System.out.println(String.format("[MSG][%s][building_friends_tree] %s",thread,message));
+                    break;
                 default:
                     System.out.println(String.format("[MSG][%s][uid%s] %s",thread,targetId,message));
             }
         }
     }
     public boolean checkUser(String userId){
-        File imageFile = new File(PhotoGrabberConfig.PHOTOS_DIR + userId + "/" + userId + PhotoGrabberConfig.JSON_EXT);
-        if (!imageFile.exists()) {
+        File jsonFile = new File(PhotoGrabberConfig.PHOTOS_DIR + userId + "/" + userId + PhotoGrabberConfig.JSON_EXT);
+        if (!jsonFile.exists()) {
             try {
-                FileUtils.deleteDirectory(new File(PhotoGrabberConfig.PHOTOS_DIR + userId));
+                File userDir = new File(PhotoGrabberConfig.PHOTOS_DIR + userId);
+                if (userDir.exists()) {
+                    FileUtils.deleteDirectory(userDir);
+                    logger("m Found directory without json. Reloading user.");
+                }
             } catch (IOException e) {
-                //do nothing
+                logger(String.format("e IO Exception on checking user %s directory.",userId));
             }
             return false;
         }

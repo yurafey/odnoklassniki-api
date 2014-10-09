@@ -38,7 +38,7 @@ public class PhotoGrabberThread extends Thread {
         grabUserPhotosWithMetadata(targetId);
     }
 
-    private List<String> grabUserPhotosWithMetadata(String targetId) {
+    private void grabUserPhotosWithMetadata(String targetId) {
         this.threadId = Thread.currentThread().getName();
         utils = new PhotoGrabberUtils(threadId, targetId);
         if (!utils.checkUser(targetId)) {
@@ -64,21 +64,14 @@ public class PhotoGrabberThread extends Thread {
                     userJson.writeJson();
                     utils.logger("m Finished grab.");
                 }
-                return friendsList;
-            } catch (OdklApiException a) {
-                utils.logger("e Privacy error.");
-            }
-        } else {
-            try {
-                List<String> friendsList = api.friends().getFriends(targetId);
-                if (friendsList != null) {
-                    return friendsList;
-                }
+
             } catch (OdklApiException a) {
                 utils.logger("e Privacy error.");
             }
         }
-        return null;
+//        else {
+//            utils.logger("m User copy found.");
+//        }
     }
 
     private Map<String, Object> grabUserPhotos(String userId) {

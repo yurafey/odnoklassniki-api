@@ -1,7 +1,5 @@
 package com.github.mastersobg.odkl;
 
-import com.github.mastersobg.odkl.OdklApi;
-import com.github.mastersobg.odkl.OdklRequest;
 import com.github.mastersobg.odkl.model.User;
 import com.github.mastersobg.odkl.util.JsonUtil;
 
