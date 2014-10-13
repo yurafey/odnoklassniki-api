@@ -33,8 +33,11 @@ public class PhotoGrabberUtils {
                 case "bt":
                     System.out.println(String.format("[MSG][%s][building_friends_tree] %s",thread,message));
                     break;
+                case "f":
+                    System.out.println(String.format("[MSG][%s][checking] %s",thread,message));
+                    break;
                 default:
-                    System.out.println(String.format("[MSG][%s][uid%s] %s",thread,targetId,message));
+                    System.out.println(String.format("[MSG][%s] %s",thread,message));
             }
         }
     }

@@ -11,6 +11,6 @@ public class TestMain {
     public static void main(String[] args){
         OdklApi api = new OdklApi(ApiConfig.APP_ID, ApiConfig.APP_PUBLIC_KEY, ApiConfig.APP_SECRET_KEY,ApiConfig.ACCESS_TOKEN , ApiConfig.REFRESH_TOKEN);
         PhotoGrabber gr = new PhotoGrabber(api);
-        gr.recursivePhotoGrabWithMetadata("489288866613",2);
+        gr.recursivePhotoGrabWithMetadata("561861978257",0);
      }
 }

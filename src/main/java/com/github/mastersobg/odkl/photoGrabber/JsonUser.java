@@ -73,6 +73,7 @@ public class JsonUser {
         writeResult.put("markedPhotos", markedPhotos);
         File jsonFile = new File(PHOTOS_DIR + uid + "/" + uid + JSON_EXT);
         try {
+            //writeResult.
             FileUtils.writeStringToFile(jsonFile, writeResult.toJSONString());
         } catch (IOException e) {
             System.out.println(String.format("[ERR][uid%s] Json write error. IOException.",uid));

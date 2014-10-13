@@ -122,7 +122,7 @@ public class PhotoGrabber {
     }
 
     private void checkAndFixAllUsers(LinkedHashSet<String> friendsSet) {
-        utils.logger("m Starting grabbed users check.");
+        utils.logger("f Starting grabbed users check.");
         Iterator<String> itr = friendsSet.iterator();
         LinkedHashSet<String> crashedUsersId = new LinkedHashSet<>();
         while (itr.hasNext()) {
@@ -144,7 +144,7 @@ public class PhotoGrabber {
                 //
             }
         }
-        utils.logger("m Finished grabbed users check.");
+        utils.logger("f Finished grabbed users check.");
     }
 
     public void recursivePhotoGrabWithMetadata(String targetId, Integer friendsDepthLevel) {

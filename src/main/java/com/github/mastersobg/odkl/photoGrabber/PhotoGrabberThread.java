@@ -153,43 +153,29 @@ public class PhotoGrabberThread extends Thread {
         return photoIdOwnerIdTagsMap;
     }
 
-//    private JSONObject getUserMarkFromPhoto(String userId, String photoId) {
-//        JSONArray marksArray = getAllMarksFromPhoto(photoId);
-//        if (marksArray != null && marksArray.size() != 0) {
-//            for (int i = 0; i < marksArray.size(); i++) {
-//                JSONObject tag = (JSONObject) marksArray.get(i);
-//                if (tag.get("id").equals(userId)) {
-//                    tag.put("marksNum", marksArray.size());
-//                    return tag;
-//                }
-//            }
-//        }
-//        return null;
-//    }
-
     private JSONArray getMarksWithUserFromPhoto(String userId, String photoId) {
         JSONArray marksArray = getAllMarksFromPhoto(photoId);
         boolean toReturn = false;
         if (marksArray != null) {
             int marksArraySize = marksArray.size();
-            if (marksArraySize>0) {
-                List<Integer> toRemove = new ArrayList<>();
+            if (marksArraySize > 0) {
                 for (int i = 0; i < marksArraySize; i++) {
                     JSONObject tag = (JSONObject) marksArray.get(i);
+                    String uid = (String) tag.get("user_id");
+                    tag.remove("user_id");
+                    String uidTmp = uid;
                     if (((String) tag.get("id")).contains("-")) {
-                        toRemove.add(i);
-                        continue;
-                    } else if (tag.get("user_id").equals(userId)) {
+                        uidTmp = "0";
+                        tag.remove("text");
+                    } else if (uid.equals(userId)) {
                         toReturn = true;
                     }
+                    tag.put("uid", uidTmp);
                     tag.remove("index");
                     tag.remove("id");
                     marksArray.set(i, tag);
                 }
                 if (toReturn) {
-                    if (toRemove.size() > 0) {
-                        for (int i:toRemove) marksArray.remove(i);
-                    }
                     return marksArray;
                 }
             }
