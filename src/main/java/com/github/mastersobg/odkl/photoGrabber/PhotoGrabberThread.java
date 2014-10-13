@@ -139,11 +139,11 @@ public class PhotoGrabberThread extends Thread {
                 String photoOwnerId = JsonUtil.getString(photo, "user_id");
                 String imgUrl = JsonUtil.getString(photo, "pic640x480");
                 String photoId = (String) photo.get("id");
-                JSONObject currentTag = getUserMarkFromPhoto(userId, photoId);
-                if (currentTag != null) {
+                JSONArray currentTags = getMarksWithUserFromPhoto(userId, photoId);
+                if (currentTags != null) {
                     Map<String, Object> additionMap = new HashMap<String, Object>();
                     additionMap.put("photoOwner", photoOwnerId);
-                    additionMap.put("tag", currentTag);
+                    additionMap.put("tags", currentTags);
                     photoIdOwnerIdTagsMap.put(photoId, additionMap);
                 }
                 loadImage(imgUrl, userId, photoId);
@@ -153,14 +153,44 @@ public class PhotoGrabberThread extends Thread {
         return photoIdOwnerIdTagsMap;
     }
 
-    private JSONObject getUserMarkFromPhoto(String userId, String photoId) {
+//    private JSONObject getUserMarkFromPhoto(String userId, String photoId) {
+//        JSONArray marksArray = getAllMarksFromPhoto(photoId);
+//        if (marksArray != null && marksArray.size() != 0) {
+//            for (int i = 0; i < marksArray.size(); i++) {
+//                JSONObject tag = (JSONObject) marksArray.get(i);
+//                if (tag.get("id").equals(userId)) {
+//                    tag.put("marksNum", marksArray.size());
+//                    return tag;
+//                }
+//            }
+//        }
+//        return null;
+//    }
+
+    private JSONArray getMarksWithUserFromPhoto(String userId, String photoId) {
         JSONArray marksArray = getAllMarksFromPhoto(photoId);
-        if (marksArray != null && marksArray.size() != 0) {
-            for (int i = 0; i < marksArray.size(); i++) {
-                JSONObject tag = (JSONObject) marksArray.get(i);
-                if (tag.get("id").equals(userId)) {
-                    tag.put("marksNum", marksArray.size());
-                    return tag;
+        boolean toReturn = false;
+        if (marksArray != null) {
+            int marksArraySize = marksArray.size();
+            if (marksArraySize>0) {
+                List<Integer> toRemove = new ArrayList<>();
+                for (int i = 0; i < marksArraySize; i++) {
+                    JSONObject tag = (JSONObject) marksArray.get(i);
+                    if (((String) tag.get("id")).contains("-")) {
+                        toRemove.add(i);
+                        continue;
+                    } else if (tag.get("user_id").equals(userId)) {
+                        toReturn = true;
+                    }
+                    tag.remove("index");
+                    tag.remove("id");
+                    marksArray.set(i, tag);
+                }
+                if (toReturn) {
+                    if (toRemove.size() > 0) {
+                        for (int i:toRemove) marksArray.remove(i);
+                    }
+                    return marksArray;
                 }
             }
         }
@@ -216,11 +246,11 @@ public class PhotoGrabberThread extends Thread {
                     albumsNum++;
                     for (int i = 0; i < photoIdList.size(); i++) {
                         String photoId = photoIdList.get(i);
-                        JSONObject tag = getUserMarkFromPhoto(userId, photoId);
-                        if (tag != null) {
+                        JSONArray tags = getMarksWithUserFromPhoto(userId, photoId);
+                        if (tags != null) {
                             Map<String, Object> additionMap = new HashMap<String, Object>();
                             additionMap.put("photoOwner", userId);
-                            additionMap.put("tag", tag);
+                            additionMap.put("tags", tags);
                             photoIdOwnerIdTagsMap.put(photoId, additionMap);
                             utils.logger(String.format("m Found user mark on photo %s from album %s.", photoId, albumId));
                             loadImage(getPhotoUrl(photoId), userId, photoId);
