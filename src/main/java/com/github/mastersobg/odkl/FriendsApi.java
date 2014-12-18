@@ -49,10 +49,13 @@ public class FriendsApi {
             }
             return resFriendList;
         } catch (OdklApiRuntimeException e) {
-            if (PhotoGrabberConfig.LOGS) System.out.println("[ERR] Runtime error. Can't get friends. Connection failed");
+            if (PhotoGrabberConfig.LOGS)
+                System.out.println("[ERR] Runtime error. Can't get friends. Connection failed");
         }
         return null;
     }
+
+
 
     /**
      * Returns IDs of the current user friends, who are authorized the calling application.

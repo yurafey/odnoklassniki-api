@@ -36,13 +36,12 @@ public class JsonUser {
         this.albumsNum += albumsNum;
     }
 
-    public void addMarkedPhoto(String photoId, String photoOwner, int marksNum, Long x, Long y) {
+    public void addMarkedPhoto(String photoId, String photoOwner, JSONArray marksFromPhotoWithUser) {
         JSONObject addition = new JSONObject();
         addition.put("photoId", photoId);
         addition.put("photoOwner", photoOwner);
-        addition.put("marksNum", marksNum);
-        addition.put("x", x);
-        addition.put("y", y);
+        addition.put("marksNum", marksFromPhotoWithUser.size());
+        addition.put("marks",marksFromPhotoWithUser);
         markedPhotos.add(addition);
     }
 
@@ -58,8 +57,8 @@ public class JsonUser {
                         break;
                     default:
                         Map<String, Object> metaMap = (Map<String, Object>) addition.get(key);
-                        JSONObject userMarkFromPhoto = (JSONObject) metaMap.get("tag");
-                        addMarkedPhoto(key, (String) metaMap.get("photoOwner"), (int) userMarkFromPhoto.get("marksNum"), (Long) userMarkFromPhoto.get("x"), (Long) userMarkFromPhoto.get("y"));
+                        JSONArray marksFromPhotoWithUser = (JSONArray) metaMap.get("tags");
+                        addMarkedPhoto(key, (String) metaMap.get("photoOwner"),marksFromPhotoWithUser);
                 }
             }
         }
@@ -74,6 +73,7 @@ public class JsonUser {
         writeResult.put("markedPhotos", markedPhotos);
         File jsonFile = new File(PHOTOS_DIR + uid + "/" + uid + JSON_EXT);
         try {
+            //writeResult.
             FileUtils.writeStringToFile(jsonFile, writeResult.toJSONString());
         } catch (IOException e) {
             System.out.println(String.format("[ERR][uid%s] Json write error. IOException.",uid));
